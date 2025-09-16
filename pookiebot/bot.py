@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 import os
 import logging
+import traceback
+
+from utils.chat_formatter import codebox
 
 COMMAND_PREFIX = "pookie please "
 
@@ -18,10 +21,28 @@ bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
 async def on_ready():
     try:
         await bot.load_extension("cogs.basic")
+        await bot.load_extension("cogs.currency_conversion")
         await bot.tree.sync()
     except Exception as e:
         print(f"Error loading extension: {e}")
     print(f"Logged in as {bot.user}")
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    logging.warning(
+        f"Command error: {error}\nTraceback: {''.join(traceback.format_tb(error.__traceback__))}"
+    )
+
+    embed = discord.Embed(
+        title="Command Error",
+        description=f"An error occured in command `{ctx.command}`",
+        color=discord.Color.red(),
+    )
+
+    embed.add_field(name="Error Details", value=codebox(error), inline=False)
+    embed.add_field(name="Invoked by", value=ctx.author.mention, inline=True)
+    await ctx.send(embed=embed)
 
 
 def main():
