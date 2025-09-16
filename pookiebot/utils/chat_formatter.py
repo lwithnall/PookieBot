@@ -37,5 +37,5 @@ def heading(text: str, level: int) -> str:
 
 
 def codebox(text: str, language: str = "") -> str:
-    """ Print given text in a codebox, formats it as specified language. """
+    """Print given text in a codebox, formats it as specified language."""
     return f"```{language}\n{text}\n```"

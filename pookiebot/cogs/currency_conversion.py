@@ -1,8 +1,3 @@
-"""
-AUD currency conversion commands
-Information taken from www.xe.com
-"""
-
 from discord.ext import commands
 from bs4 import BeautifulSoup
 import aiohttp
@@ -11,6 +6,11 @@ from utils.chat_formatter import codebox, heading
 
 
 class CurrencyConversion(commands.Cog):
+    """
+    Currency converting functionality
+    Uses www.xe.com to convert between given currencies
+    """
+
     # Country currency codes supported be xe.com
     VALID_CURRENCIES = {
         'AED', 'ALL', 'AMD', 'ARS', 'AUD', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN',

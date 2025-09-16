@@ -22,6 +22,7 @@ async def on_ready():
     try:
         await bot.load_extension("cogs.basic")
         await bot.load_extension("cogs.currency_conversion")
+        await bot.load_extension("cogs.gambling.session")
         await bot.tree.sync()
     except Exception as e:
         print(f"Error loading extension: {e}")
@@ -46,8 +47,7 @@ async def on_command_error(ctx, error):
 
 
 def main():
-    handler = logging.FileHandler(
-        filename="logs.log", encoding="utf-8", mode="w")
+    handler = logging.FileHandler(filename="logs.log", encoding="utf-8", mode="w")
 
     if (BOT_TOKEN := os.getenv("DISCORD_POOKIE_BOT_TOKEN")) is None:
         raise RuntimeError("Problem accessing bot token!")

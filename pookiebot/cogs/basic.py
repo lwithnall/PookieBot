@@ -49,7 +49,9 @@ class Basic(commands.Cog):
             stopTime = perf_counter()
             startTime = self.stopwatches.pop(author.id)
             # Time difference returned in seconds to three decimal places
-            await ctx.send(f"{stopTime - startTime:.3f} seconds elapsed for {author.mention}")
+            await ctx.send(
+                f"{stopTime - startTime:.3f} seconds elapsed for {author.mention}"
+            )
 
 
 async def setup(bot: commands.Bot):
