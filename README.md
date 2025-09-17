@@ -1,4 +1,7 @@
 # PookieBot
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Black](https://img.shields.io/badge/code%20style-Black-000000)
+
 Random discord bot for use in personal servers.
 
 ## Getting Started
