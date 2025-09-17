@@ -12,6 +12,8 @@ class CurrencyConversion(commands.Cog):
     """
 
     # Country currency codes supported be xe.com
+    # prevent black from reformatting
+    # fmt: off
     VALID_CURRENCIES = {
         'AED', 'ALL', 'AMD', 'ARS', 'AUD', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN',
         'BHD', 'BND', 'BOB', 'BSD', 'BTN', 'BWP', 'CAD', 'CHF', 'CLP', 'COP',
@@ -35,7 +37,7 @@ class CurrencyConversion(commands.Cog):
         Parameters
         amount - converting amount of orig currency to targ currency
         orig - country code for original country currency
-        targ - country code for target country currency 
+        targ - country code for target country currency
 
         Returns
         xe_link - the link to www.xe.com with specified inputs
@@ -47,7 +49,7 @@ class CurrencyConversion(commands.Cog):
     async def currencies(self, ctx):
         """List all supported currency codes"""
         # Format list into comma-seperated values
-        currency_list = ', '.join(self.VALID_CURRENCIES)
+        currency_list = ", ".join(self.VALID_CURRENCIES)
 
         # Output currencies in codebox with small header
         await ctx.send(heading("Valid Currencies", 3))
@@ -65,9 +67,13 @@ class CurrencyConversion(commands.Cog):
 
         # xe.com converter will only accept specific currency codes (those listed in self.VALID_CURRENCIES)
         if orig not in self.VALID_CURRENCIES:
-            return await ctx.send(f"Invalid original currency supplied {orig}. Examples: USD, EUR, AUD")
+            return await ctx.send(
+                f"Invalid original currency supplied {orig}. Examples: USD, EUR, AUD"
+            )
         if targ not in self.VALID_CURRENCIES:
-            return await ctx.send(f"Invalid target currency supplied {targ}. Examples: USD, EUR, AUD")
+            return await ctx.send(
+                f"Invalid target currency supplied {targ}. Examples: USD, EUR, AUD"
+            )
 
         try:
             # Conversion information can be retrieved by inputting parameters into website link
@@ -77,26 +83,30 @@ class CurrencyConversion(commands.Cog):
                 async with session.get(xe_link) as response:
                     # Parse through text found on xe.com
                     text = await response.text()
-                    soup = BeautifulSoup(text, 'html.parser')
+                    soup = BeautifulSoup(text, "html.parser")
 
                     # Conversion data is held in <p> elements with classes:
                     # 'sc-c5062ab2-0 cFcKFA' for original (orig) currency
                     # 'sc-c5062ab2-1 jKDFIr' for target (targ) currency
                     original_amount = soup.find(
-                        'p', class_="sc-c5062ab2-0 cFcKFA").getText()
-                    new_amount = soup.find(
-                        'p', class_="sc-c5062ab2-1 jKDFIr").getText()
+                        "p", class_="sc-c5062ab2-0 cFcKFA"
+                    ).getText()
+                    new_amount = soup.find("p", class_="sc-c5062ab2-1 jKDFIr").getText()
 
                     # Handle case where beautiful soup fails (e.g. if site structure changes)
                     if not original_amount or not new_amount:
-                        return await ctx.send(f"Conversion data could not be retrieved.")
+                        return await ctx.send(
+                            f"Conversion data could not be retrieved."
+                        )
 
                     # Original data is in format: '<amount> <orig name> ='
                     # Target data is in format: '<converted amount> <targ name>'
                     return await ctx.send(f"{original_amount} {new_amount}")
 
         except aiohttp.ClientError:
-            return await ctx.send("Error occurred while querying xe.com for conversion data.")
+            return await ctx.send(
+                "Error occurred while querying xe.com for conversion data."
+            )
 
     @commands.command()
     async def erate(self, ctx, orig: str, targ: str):

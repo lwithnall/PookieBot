@@ -20,25 +20,34 @@ def session_game(func):
     - Session is in progress
     - No other gambling game is running
     """
+
     @wraps(func)
     async def decorate_wrapper(self, ctx, *args, **kwargs):
         if not self._active:
-            return await ctx.send("No gambling session currently running. Start one using the 'gamble' command.")
+            return await ctx.send(
+                "No gambling session currently running. Start one using the 'gamble' command."
+            )
         if self._current_game:
             return await ctx.send("Game already in progress.")
         return await func(self, ctx, *args, **kwargs)
+
     return decorate_wrapper
+
 
 def requires_session(func):
     """
     Wrapper for basic commands interacting with the session (e.g. joining, starting)
     Checks if a session is running.
     """
+
     @wraps(func)
     async def decorate_wrapper(self, ctx, *args, **kwargs):
         if not self._active:
-            return await ctx.send("No gambling session currently running. Start one using the 'gamble' command.")
+            return await ctx.send(
+                "No gambling session currently running. Start one using the 'gamble' command."
+            )
         return await func(self, ctx, *args, **kwargs)
+
     return decorate_wrapper
 
 
@@ -79,7 +88,9 @@ class GamblingSession(commands.Cog):
         """Join the current gambling session if one is running."""
         author = ctx.author
         if author in self.bank:
-            return await ctx.send(f"Hi {author.display_name}, you're already in the session.")
+            return await ctx.send(
+                f"Hi {author.display_name}, you're already in the session."
+            )
         self.bank.add_player(author)
         return await ctx.send(f"{author.display_name} has joined the session!")
 
@@ -89,7 +100,9 @@ class GamblingSession(commands.Cog):
         """Leave the current gambling session if one is running"""
         author = ctx.author
         if author not in self.bank:
-            return await ctx.send(f"Hi {author.display_name}, you're not in the current session.")
+            return await ctx.send(
+                f"Hi {author.display_name}, you're not in the current session."
+            )
 
         self.bank.remove_player(author)
         return await ctx.send(f"{author.display_name} has left the session </3")
@@ -106,7 +119,7 @@ class GamblingSession(commands.Cog):
             3. player0: 0
         """
         # Get player balances
-        # Balance dictionary converted to tuple array using .items()    
+        # Balance dictionary converted to tuple array using .items()
         # Format [(player1, money), (player2, money), ...]
         balances = self.bank.get_balances().items()
 
@@ -131,6 +144,7 @@ class GamblingSession(commands.Cog):
     @commands.command()
     @session_game
     async def roulette(self, ctx, *players: Optional[discord.Member]): ...
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GamblingSession(bot=bot))
