@@ -15,8 +15,8 @@ SUITS = {
 RANKS = {str(x) for x in range(2, 10)}.union(set("JQKA"))
 
 # Type hints for card games
-type Card = (str, str)  # (suit, rank)
-type Deck = list[Card]
+Card = tuple[str, str]  # (suit, rank)
+Deck = list[Card]
 
 
 class Game:
