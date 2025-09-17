@@ -10,10 +10,10 @@ class Bank:
     MIN_BALANCE = 0
 
     def __init__(self, *players: discord.Member):
-        self._balances = {player.name: self.INITIAL_BALANCE for player in players}
+        self._balances = {player: self.INITIAL_BALANCE for player in players}
 
     def __contains__(self, player: discord.Member):
-        return player.name in self._balances
+        return player in self._balances
 
     def valid_bet(self, player: discord.Member, amount: int):
         """
@@ -40,8 +40,7 @@ class Bank:
 
     def add_player(self, player: discord.Member):
         """Add player to bank with initial balance"""
-        self._balances[player.name] = self.INITIAL_BALANCE
-        print(self._balances)
+        self._balances[player] = self.INITIAL_BALANCE
 
     def remove_player(self, player: discord.Member):
         """Remove player from bank"""

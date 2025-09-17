@@ -4,13 +4,13 @@ import discord
 from discord.ext import commands
 from .banking import Bank
 from .games import Poker, BlackJack, Roulette
-from utils.chat_formatter import heading, italics
+from utils.chat_formatter import heading
 
-GAMES = {"poker", "blackjack", "roulette"}
+# GAMES = {"poker", "blackjack", "roulette"}
 
 
-def valid_game(game: str):
-    return game in GAMES
+# def valid_game(game: str):
+#     return game in GAMES
 
 
 def session_game(func):
@@ -22,12 +22,23 @@ def session_game(func):
     """
     @wraps(func)
     async def decorate_wrapper(self, ctx, *args, **kwargs):
+        if not self._active:
+            return await ctx.send("No gambling session currently running. Start one using the 'gamble' command.")
         if self._current_game:
             return await ctx.send("Game already in progress.")
-        if not self._active:
-            return await ctx.send("Please start a gambling sessions using 'gamble' command.")
         return await func(self, ctx, *args, **kwargs)
+    return decorate_wrapper
 
+def requires_session(func):
+    """
+    Wrapper for basic commands interacting with the session (e.g. joining, starting)
+    Checks if a session is running.
+    """
+    @wraps(func)
+    async def decorate_wrapper(self, ctx, *args, **kwargs):
+        if not self._active:
+            return await ctx.send("No gambling session currently running. Start one using the 'gamble' command.")
+        return await func(self, ctx, *args, **kwargs)
     return decorate_wrapper
 
 
@@ -43,38 +54,39 @@ class GamblingSession(commands.Cog):
         """Begin gambling session with provided players."""
         if self._active:
             return await ctx.send("Session already in progress.")
-
         if len(players) < 2:
-            raise TypeError("Must have 2 or more participants.")
+            return await ctx.send("Must have 2 or more participants.")
+
         self.bank = Bank(*players)
         self._active = True
         self._current_game = None
 
         players_str = ", ".join([player.display_name for player in players])
-        print(self.bank.get_balances())
         return await ctx.send(f"Session has begun!! Players are {players_str}.")
 
     @commands.command(name="quit")
+    @requires_session
     async def terminate_session(self, ctx):
         """Terminate current gambling session."""
-        if not self._active:
-            return await ctx.send("No gambling session currently running.")
-
         self._active = False
         self._current_game = None
+        self.bank = None
         return await ctx.send("Ending session. Thanks for playing.")
 
     @commands.command()
+    @requires_session
     async def join(self, ctx):
+        """Join the current gambling session if one is running."""
         author = ctx.author
         if author in self.bank:
             return await ctx.send(f"Hi {author.display_name}, you're already in the session.")
-        print(author)
         self.bank.add_player(author)
         return await ctx.send(f"{author.display_name} has joined the session!")
 
     @commands.command()
+    @requires_session
     async def leave(self, ctx):
+        """Leave the current gambling session if one is running"""
         author = ctx.author
         if author not in self.bank:
             return await ctx.send(f"Hi {author.display_name}, you're not in the current session.")
@@ -83,35 +95,34 @@ class GamblingSession(commands.Cog):
         return await ctx.send(f"{author.display_name} has left the session </3")
 
     @commands.command()
+    @requires_session
     async def scoreboard(self, ctx):
         """
         If session is currently running print players with their current balances.
         Players are balanced in descending order by balance.
-        Example format ----
+        Example format -
             1. player1: 100
             2. plyaer2: 99
             3. player0: 0
         """
-        if not self._active:
-            return await ctx.send("Please start a gambling sessions using 'gamble' command.")
-        
         # Get player balances
         # Balance dictionary converted to tuple array using .items()    
         # Format [(player1, money), (player2, money), ...]
         balances = self.bank.get_balances().items()
 
         # Sort by money (descending order)
-        sorted(balances, key=lambda item: item[1], reverse=True)
+        balances = sorted(balances, key=lambda item: item[1], reverse=True)
 
         leaderboard = f"{heading("Leaderboard", 3)}\n"
         for num, (player, money) in enumerate(balances):
             # Convert 0-index to 1-index
-            leaderboard += f"{italics(num+1)}. {player.display_name}: ${money:,}\n"
+            leaderboard += f"{num+1}. {player.display_name}: ${money:,}\n"
         await ctx.send(leaderboard)
 
     @commands.command()
     @session_game
-    async def poker(self, ctx, *players: Optional[discord.Member]): ...
+    async def poker(self, ctx, *players: Optional[discord.Member]):
+        self._current_game = "poker"
 
     @commands.command()
     @session_game
