@@ -1,7 +1,6 @@
 from discord.ext import commands
 from random import choice
 from time import perf_counter
-
 from utils.chat_formatter import bold
 
 

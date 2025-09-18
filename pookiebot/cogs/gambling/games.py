@@ -39,7 +39,7 @@ class CardGame(Game):
     def __init__(self, bank: Bank, players: list[discord.Member]) -> None:
         """
         Initiate card game instance.
-        Deck contains typical 52 cards with 
+        Deck contains typical 52 cards with
         - suits: spades, hearts, clubs, diamonds
         - ranks: A, 2-10, J, Q, K
         Deck is shuffled on start-up
@@ -49,7 +49,7 @@ class CardGame(Game):
         super().__init__(bank, players)
         self.deck = CardGame.get_base_deck()
         self.shuffle_deck()
-        self.discards = set()
+        self.discards = []
         self.hands = None
 
     @classmethod
@@ -73,26 +73,30 @@ class CardGame(Game):
     def pop_card(self) -> Card:
         """Pop card from top of deck array. If deck is empty shuffle discards back into it, then draw."""
         if self.deck_empty():
-            self.deck = self.discards
-            self.discards = set()
-            self.shuffle_deck()
+            if self.discards:
+                self.deck = self.discards
+                self.discards = []
+                self.shuffle_deck()
+            else:
+                self.deck = CardGame.get_base_deck()
+                self.shuffle_deck()
         return self.deck.pop()
 
     def discard(self, player: discord.Member, card: Card) -> None:
         """
         Remove card from players hand and add it to the discard pile.
-        
+
         Parameters
         player: discord.Member - the player who is discarding a card
         card: Card - the card being discarded from players hand
         """
         self.hands[player].remove(card)
-        self.discards.add(card)
+        self.discards.append(card)
 
     def deal(self, handsize: int) -> None:
         """
         'Deal' cards from the deck into players hands
-        
+
         Parameters
         handsize: int - the number of cards each player can hold
         """
@@ -114,7 +118,7 @@ class BlackJack(CardGame):
     def __init__(self, bank: Bank, players: list[discord.Member]) -> None:
         super().__init__(bank, players)
 
+
 class Roulette(Game):
     def __init__(self, bank: Bank, players: list[discord.Member]) -> None:
         super().__init__(bank, players)
-    
