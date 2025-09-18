@@ -1,7 +1,7 @@
 import discord
 from random import shuffle, choice
 from .banking import Bank
-from ...utils.dm_messaging import message_user
+from utils.dm_messaging import message_user
 
 # Map cards suits to their unicode symbols
 SUITS = {
@@ -103,11 +103,11 @@ class CardGame(Game):
         self.hands = hands
 
 
-# class Poker(CardGame):
-#     def __init__(self, bank: Bank, players: list[discord.Member]) -> None:
-#         super().__init__(bank, players)
+class Poker(CardGame):
+    def __init__(self, bank: Bank, players: list[discord.Member]) -> None:
+        super().__init__(bank, players)
 
-#     def main(self): ...
+    def main(self): ...
 
 
 class BlackJack(CardGame):

@@ -24,6 +24,7 @@ async def on_ready():
         await bot.load_extension("cogs.currency_conversion")
         await bot.load_extension("cogs.gambling.session")
         await bot.tree.sync()
+        print("Finished loading extensions!")
     except Exception as e:
         print(f"Error loading extension: {e}")
     print(f"Logged in as {bot.user}")
